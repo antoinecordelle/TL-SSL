@@ -2,12 +2,15 @@ package tlssl;
 
 import java.security.cert.Certificate;
 import java.security.PublicKey;
+import java.util.ArrayList;
 
 public class Equipement {
     private PaireClesRSA maCle; // La paire de cle de l’equipement.
     private Certificat monCert; // Le certificat auto-signe.
     private String monNom; // Identite de l’equipement.
     private int monPort; // Le numéro de port d’ecoute.
+    private ArrayList<Triplet> ca;
+    private ArrayList<Triplet> da;
 
     Equipement (String nom, int port) throws Exception {
         monNom = nom;
@@ -16,15 +19,26 @@ public class Equipement {
     }
 
     public void affichage_da() {
-        // Affichage de la liste des équipements de DA.
+        for (Triplet i : da) {
+            System.out.println(i.id);
+            System.out.println(i.pubKey);
+            System.out.println(i.cert);
+        }
     }
 
     public void affichage_ca() {
-        // Affichage de la liste des équipements de CA.
+        for (Triplet i : ca) {
+            System.out.println(i.id);
+            System.out.println(i.pubKey);
+            System.out.println(i.cert);
+        }
     }
 
     public void affichage() {
-        // Affichage de l’ensemble des informations // de l’équipement.
+        System.out.println(monNom);
+        System.out.println(monCert);
+        affichage_ca();
+        affichage_da();
     }
 
     public String monNom (){
