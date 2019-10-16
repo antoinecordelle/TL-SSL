@@ -16,6 +16,8 @@ public class Equipement {
         monNom = nom;
         maCle = new PaireClesRSA();
         monCert = new Certificat(monNom, maCle, 365);
+        monCert.verifCertif(maClePub());
+        System.out.println(monCert);
     }
 
     public void affichage_da() {
