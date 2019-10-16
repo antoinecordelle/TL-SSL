@@ -6,6 +6,7 @@ import org.bouncycastle.cert.CertException;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v1CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -15,6 +16,7 @@ import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -30,6 +32,7 @@ public class Certificat {
 
         // On cree la structure qui va contenir la signature :
         try {
+            Security.addProvider(new BouncyCastleProvider());
             ContentSigner sigGen = new
                     JcaContentSignerBuilder("SHA1withRSA").setProvider("BC").build(privateKey);
 

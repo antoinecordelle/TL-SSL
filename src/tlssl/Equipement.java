@@ -1,6 +1,5 @@
 package tlssl;
 
-import java.security.cert.Certificate;
 import java.security.PublicKey;
 import java.util.ArrayList;
 
@@ -16,8 +15,8 @@ public class Equipement {
         monNom = nom;
         maCle = new PaireClesRSA();
         monCert = new Certificat(monNom, maCle, 365);
-        monCert.verifCertif(maClePub());
-        System.out.println(monCert);
+        System.out.println(monCert.verifCertif(maClePub()));
+        System.out.println(monCert.getX509Certificate());
     }
 
     public void affichage_da() {
@@ -53,6 +52,5 @@ public class Equipement {
 
     public Certificat monCertif() {
         return monCert;
-
     }
 }
