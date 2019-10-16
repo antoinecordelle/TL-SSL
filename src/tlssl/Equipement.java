@@ -10,8 +10,9 @@ public class Equipement {
     private int monPort; // Le numéro de port d’ecoute.
 
     Equipement (String nom, int port) throws Exception {
-        // Constructeur de l’equipement identifie par nom
-        // et qui «écoutera» sur le port port.
+        monNom = nom;
+        maCle = new PaireClesRSA();
+        monCert = new Certificat(monNom, maCle, 365);
     }
 
     public void affichage_da() {
