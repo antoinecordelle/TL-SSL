@@ -2,6 +2,7 @@ package tlssl;
 
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.CertException;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v1CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -21,7 +22,7 @@ import java.util.Date;
 
 public class Certificat {
     static private BigInteger seqnum = BigInteger.ZERO;
-    public X509Certificate x509;
+    public X509CertificateHolder x509CertificateHolder;
 
     Certificat(String nom, PaireClesRSA cle, int validityDays) {
         PublicKey publicKey = cle.Publique();
@@ -54,28 +55,27 @@ public class Certificat {
                     issuer, seqnum, startDate, endDate, subject, subjectPublicKeyInfo);
 
             // Calculer la signature et creer un certificat :
-            X509CertificateHolder x509CertificateHolder = v1CertGen.build(sigGen);
-
-            // Transformer le x509holder en certificat :
-            try {
-                X509Certificate x509 = new JcaX509CertificateConverter()
-                        .setProvider("BC").getCertificate(x509CertificateHolder);
-            } catch (CertificateException e) {
-                e.printStackTrace();
-            }
+            x509CertificateHolder = v1CertGen.build(sigGen);
 
         } catch (OperatorCreationException e) {
             e.printStackTrace();
         }
     }
 
-    public boolean verifCertif(PublicKey pubKey) throws OperatorCreationException {
+    public X509Certificate getX509Certificate() throws CertificateException {
+        // Transformer le x509holder en certificat :
+        return new JcaX509CertificateConverter()
+                .setProvider("BC").getCertificate(x509CertificateHolder);
+    }
+
+    public boolean verifCertif(PublicKey pubKey) throws OperatorCreationException, CertException {
         ContentVerifierProvider verifier =
                 new JcaContentVerifierProviderBuilder().setProvider("BC").build(pubKey);
+
         // Verification d’un certificat !
-        if (!x509.isSignatureValid(verifier)) {
+        if (!x509CertificateHolder.isSignatureValid(verifier)) {
             System.err.println("signature invalid");
         }
-        return x509.isSignatureValid(verifier);
+        return x509CertificateHolder.isSignatureValid(verifier);
     }
 }
