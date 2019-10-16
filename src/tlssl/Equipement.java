@@ -28,15 +28,15 @@ public class Equipement {
     }
 
     public String monNom (){
-        // Recuperation de l’identite de l’équipement.
+        return monNom;
     }
 
     public PublicKey maClePub() {
-        // Recuperation de la clé publique de l’équipement.
+        return maCle.Publique();
     }
 
     public Certificat monCertif() {
-        // Recuperation du certificat auto-signé
+        return monCert;
 
     }
 }
