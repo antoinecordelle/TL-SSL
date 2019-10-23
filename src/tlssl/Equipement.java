@@ -1,6 +1,7 @@
 package tlssl;
 
 import java.security.PublicKey;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 
 public class Equipement {
@@ -14,9 +15,8 @@ public class Equipement {
     Equipement (String nom, int port) throws Exception {
         monNom = nom;
         maCle = new PaireClesRSA();
-        monCert = new Certificat(monNom, maCle, 365);
-        System.out.println(monCert.verifCertif(maClePub()));
-        System.out.println(monCert.getX509Certificate());
+        monCert = new Certificat(monNom, maCle.Privee(), maCle.Publique(), 365);
+        ca = new ArrayList<Triplet>();
     }
 
     public void affichage_da() {
@@ -52,5 +52,13 @@ public class Equipement {
 
     public Certificat monCertif() {
         return monCert;
+    }
+
+    public void certify(Equipement equipement) throws CertificateException {
+        String nom = equipement.monNom();
+        PublicKey pubKey = equipement.maClePub();
+        Certificat cert = new Certificat(nom, maCle.Privee(), pubKey, 365);
+        Triplet triplet = new Triplet(nom, pubKey, cert.getX509Certificate());
+        ca.add(triplet);
     }
 }

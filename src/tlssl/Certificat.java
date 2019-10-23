@@ -26,10 +26,7 @@ public class Certificat {
     static private BigInteger seqnum = BigInteger.ZERO;
     public X509CertificateHolder x509CertificateHolder;
 
-    Certificat(String nom, PaireClesRSA cle, int validityDays) {
-        PublicKey publicKey = cle.Publique();
-        PrivateKey privateKey = cle.Privee();
-
+    Certificat(String nom, PrivateKey privateKey, PublicKey publicKey, int validityDays) {
         // On cree la structure qui va contenir la signature :
         try {
             Security.addProvider(new BouncyCastleProvider());
