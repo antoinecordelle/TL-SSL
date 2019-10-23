@@ -83,19 +83,29 @@ public class Equipement {
             socket = serverSocket.accept();
             System.out.println("Client accepted");
 
-            // takes input from the client socket
             InputStream inputStream = socket.getInputStream();
             ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+            OutputStream outputStream = socket.getOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 
-            X509Certificate cert = (X509Certificate) objectInputStream.readObject();
-            System.out.println(cert);
+            System.out.println("En attente du nom...");
+            String nom = (String) objectInputStream.readObject();
+            System.out.println("Nom reçu");
+            System.out.println("En attente de la clé publique...");
+            PublicKey publicKey = (PublicKey) objectInputStream.readObject();
+            System.out.println("Clé publique reçue");
+
+            Certificat cert = new Certificat(nom, maCle.Privee(), publicKey, 365);
+            System.out.println("Envoi du certificat...");
+            objectOutputStream.writeObject(cert.getX509Certificate());
+            System.out.println("Certificat envoyé");
 
             System.out.println("Closing connection");
 
             // close connection
             socket.close();
         }
-        catch(IOException | ClassNotFoundException i)
+        catch(IOException | ClassNotFoundException | CertificateException i)
         {
             System.out.println(i);
         }
@@ -110,13 +120,25 @@ public class Equipement {
             OutputStream outputStream = socket.getOutputStream();
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 
-            System.out.println("Sending messages to the ServerSocket");
-            objectOutputStream.writeObject(monCert.getX509Certificate());
+            System.out.println("Envoi du nom...");
+            objectOutputStream.writeObject(monNom());
+            System.out.println("Nom envoyé");
+            System.out.println("Envoi de la clé publique...");
+            objectOutputStream.writeObject(maClePub());
+            System.out.println("Clé publique envoyée");
+
+            InputStream inputStream = socket.getInputStream();
+            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+
+            System.out.println("En attente du certificat...");
+            X509Certificate cert = (X509Certificate) objectInputStream.readObject();
+            System.out.println("Certificat reçu");
+            System.out.println(cert);
 
             // close the connection
             socket.close();
         }
-        catch(IOException | CertificateException i)
+        catch(IOException | ClassNotFoundException i)
         {
             System.out.println(i);
         }
