@@ -54,6 +54,9 @@ public class Main {
                     System.out.println(equipement.monCertif().getX509Certificate());
                     break;
 
+                case "r":
+                    equipement.affichage_ca();
+
                 case "s":
                     equipement.startServer();
                     break;
