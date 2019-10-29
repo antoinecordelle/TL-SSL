@@ -56,6 +56,11 @@ public class Main {
 
                 case "r":
                     equipement.affichage_ca();
+                    break;
+
+                case "u":
+                    equipement.affichage_da();
+                    break;
 
                 case "s":
                     equipement.startServer();
