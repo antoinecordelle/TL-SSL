@@ -62,6 +62,13 @@ public class Main {
                     equipement.startClient();
                     break;
 
+                case "q":
+                    break;
+
+                default:
+                    System.out.println(help);
+                    break;
+
                 }
 
         }
