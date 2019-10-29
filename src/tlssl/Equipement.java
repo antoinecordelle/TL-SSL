@@ -111,6 +111,7 @@ public class Equipement {
 
             // close connection
             socket.close();
+            serverSocket.close();
         }
         catch(IOException | ClassNotFoundException | CertificateException i)
         {
