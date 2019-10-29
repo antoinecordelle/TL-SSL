@@ -25,6 +25,7 @@ public class Equipement {
         maCle = new PaireClesRSA();
         monCert = new Certificat(monNom, maCle.Privee(), maCle.Publique(), 365);
         ca = new ArrayList<Triplet>();
+        da = new ArrayList<Triplet>();
 
     }
 
