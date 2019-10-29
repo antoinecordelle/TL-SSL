@@ -99,6 +99,12 @@ public class Equipement {
             System.out.println("Envoi du certificat...");
             objectOutputStream.writeObject(cert.getX509Certificate());
             System.out.println("Certificat envoyé");
+            System.out.println("Envoi du nom...");
+            objectOutputStream.writeObject(monNom());
+            System.out.println("Nom envoyé");
+            System.out.println("Envoi de la clé publique...");
+            objectOutputStream.writeObject(maClePub());
+            System.out.println("Clé publique envoyée");
 
             System.out.println("Closing connection");
 
@@ -133,10 +139,19 @@ public class Equipement {
             System.out.println("En attente du certificat...");
             X509Certificate cert = (X509Certificate) objectInputStream.readObject();
             System.out.println("Certificat reçu");
-            System.out.println(cert);
+            System.out.println("En attente du nom...");
+            String nom = (String) objectInputStream.readObject();
+            System.out.println("Nom reçu");
+            System.out.println("En attente de la clé publique...");
+            PublicKey pubKey = (PublicKey) objectInputStream.readObject();
+            System.out.println("Clé publique reçue");
 
             // close the connection
             socket.close();
+
+            // add certificate to CA
+            Triplet triplet = new Triplet(nom, pubKey, cert);
+            ca.add(triplet);
         }
         catch(IOException | ClassNotFoundException i)
         {
