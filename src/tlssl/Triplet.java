@@ -13,4 +13,8 @@ public class Triplet implements java.io.Serializable {
         this.pubKey = pubKey;
         this.cert = cert;
     }
+
+    public boolean equals(Triplet triplet) {
+        return triplet.id.equals(id) && triplet.pubKey.equals(pubKey) && triplet.cert.equals(cert);
+    }
 }
