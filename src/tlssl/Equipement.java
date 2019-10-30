@@ -89,9 +89,9 @@ public class Equipement {
             OutputStream outputStream = socket.getOutputStream();
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 
-            String nom = (String) objectInputStream.readObject();
+            String nom_c = (String) objectInputStream.readObject();
 
-            System.out.println("Insérer l'équipement " + nom + " ? oui/non");
+            System.out.println("Insérer l'équipement " + nom_c + " ? oui/non");
 
             BufferedReader input  = new BufferedReader(new InputStreamReader(System.in));
             String test = input.readLine();
@@ -100,12 +100,18 @@ public class Equipement {
                 // Sending confirmation
                 objectOutputStream.writeObject(true);
 
-                PublicKey publicKey = (PublicKey) objectInputStream.readObject();
+                PublicKey publicKey_c = (PublicKey) objectInputStream.readObject();
 
-                Certificat cert = new Certificat(nom, maCle.Privee(), publicKey, 365);
-                objectOutputStream.writeObject(cert.getX509Certificate());
+                Certificat cert_s = new Certificat(nom_c, maCle.Privee(), publicKey_c, 365);
+                objectOutputStream.writeObject(cert_s.getX509Certificate());
                 objectOutputStream.writeObject(monNom());
                 objectOutputStream.writeObject(maClePub());
+
+                X509Certificate cert_c = (X509Certificate) objectInputStream.readObject();
+                // add certificate to CA
+                Triplet triplet = new Triplet(nom_c, publicKey_c, cert_c);
+                ca.add(triplet);
+
             }
             else
             {
@@ -144,14 +150,18 @@ public class Equipement {
             {
                 objectOutputStream.writeObject(maClePub());
 
-                X509Certificate cert = (X509Certificate) objectInputStream.readObject();
-                String nom = (String) objectInputStream.readObject();
-                PublicKey pubKey = (PublicKey) objectInputStream.readObject();
+                X509Certificate cert_s = (X509Certificate) objectInputStream.readObject();
+                String nom_s = (String) objectInputStream.readObject();
+                PublicKey publicKey_s = (PublicKey) objectInputStream.readObject();
                 System.out.println("Insertion terminée");
 
                 // add certificate to CA
-                Triplet triplet = new Triplet(nom, pubKey, cert);
+                Triplet triplet = new Triplet(nom_s, publicKey_s, cert_s);
                 ca.add(triplet);
+
+                Certificat cert_c = new Certificat(nom_s, maCle.Privee(), publicKey_s, 365);
+                objectOutputStream.writeObject(cert_c.getX509Certificate());
+
             }
             else
             {
@@ -162,7 +172,7 @@ public class Equipement {
             socket.close();
             System.out.println("Closing connection");
         }
-        catch(IOException | ClassNotFoundException i)
+        catch(IOException | ClassNotFoundException | CertificateException i)
         {
             System.out.println(i);
         }
