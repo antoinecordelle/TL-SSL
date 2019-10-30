@@ -89,9 +89,7 @@ public class Equipement {
             OutputStream outputStream = socket.getOutputStream();
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 
-            System.out.println("En attente du nom...");
             String nom = (String) objectInputStream.readObject();
-            System.out.println("Nom reçu");
 
             System.out.println("Insérer l'équipement " + nom + " ? oui/non");
 
@@ -102,20 +100,12 @@ public class Equipement {
                 // Sending confirmation
                 objectOutputStream.writeObject(true);
 
-                System.out.println("En attente de la clé publique...");
                 PublicKey publicKey = (PublicKey) objectInputStream.readObject();
-                System.out.println("Clé publique reçue");
 
                 Certificat cert = new Certificat(nom, maCle.Privee(), publicKey, 365);
-                System.out.println("Envoi du certificat...");
                 objectOutputStream.writeObject(cert.getX509Certificate());
-                System.out.println("Certificat envoyé");
-                System.out.println("Envoi du nom...");
                 objectOutputStream.writeObject(monNom());
-                System.out.println("Nom envoyé");
-                System.out.println("Envoi de la clé publique...");
                 objectOutputStream.writeObject(maClePub());
-                System.out.println("Clé publique envoyée");
             }
             else
             {
@@ -143,9 +133,8 @@ public class Equipement {
             OutputStream outputStream = socket.getOutputStream();
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 
-            System.out.println("Envoi du nom...");
+            System.out.println("Demande d'insertion...");
             objectOutputStream.writeObject(monNom());
-            System.out.println("Nom envoyé");
 
             InputStream inputStream = socket.getInputStream();
             ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
@@ -153,23 +142,20 @@ public class Equipement {
             boolean test = (boolean)objectInputStream.readObject();
             if (test)
             {
-                System.out.println("Envoi de la clé publique...");
                 objectOutputStream.writeObject(maClePub());
-                System.out.println("Clé publique envoyée");
 
-                System.out.println("En attente du certificat...");
                 X509Certificate cert = (X509Certificate) objectInputStream.readObject();
-                System.out.println("Certificat reçu");
-                System.out.println("En attente du nom...");
                 String nom = (String) objectInputStream.readObject();
-                System.out.println("Nom reçu");
-                System.out.println("En attente de la clé publique...");
                 PublicKey pubKey = (PublicKey) objectInputStream.readObject();
-                System.out.println("Clé publique reçue");
+                System.out.println("Insertion terminée");
 
                 // add certificate to CA
                 Triplet triplet = new Triplet(nom, pubKey, cert);
                 ca.add(triplet);
+            }
+            else
+            {
+                System.out.println("Insertion refusée");
             }
 
             // close the connection
