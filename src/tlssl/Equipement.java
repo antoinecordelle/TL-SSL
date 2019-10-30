@@ -112,6 +112,10 @@ public class Equipement {
                 Triplet triplet = new Triplet(nom_c, publicKey_c, cert_c);
                 ca.add(triplet);
 
+                ArrayList<Triplet> da_c = new ArrayList<Triplet>();
+                da_c.addAll(ca);
+                da_c.addAll(da);
+                objectOutputStream.writeObject(da_c);
             }
             else
             {
@@ -162,6 +166,7 @@ public class Equipement {
                 Certificat cert_c = new Certificat(nom_s, maCle.Privee(), publicKey_s, 365);
                 objectOutputStream.writeObject(cert_c.getX509Certificate());
 
+                da = (ArrayList<Triplet>) objectInputStream.readObject();
             }
             else
             {
