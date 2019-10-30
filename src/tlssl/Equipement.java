@@ -194,8 +194,16 @@ public class Equipement {
 
             HashSet<Triplet> ca_c = (HashSet<Triplet>) objectInputStream.readObject();
             HashSet<Triplet> da_c = (HashSet<Triplet>) objectInputStream.readObject();
-            da.addAll(ca_c);
-            da.addAll(da_c);
+            for (Triplet t : ca_c) {
+                if (!isInCAorDA(t)) {
+                    da.add(t);
+                }
+            }
+            for (Triplet t : da_c) {
+                if (!isInCAorDA(t)) {
+                    da.add(t);
+                }
+            }
 
             socket.close();
             serverSocket.close();
@@ -217,8 +225,16 @@ public class Equipement {
 
             HashSet<Triplet> ca_s = (HashSet<Triplet>) objectInputStream.readObject();
             HashSet<Triplet> da_s = (HashSet<Triplet>) objectInputStream.readObject();
-            da.addAll(ca_s);
-            da.addAll(da_s);
+            for (Triplet t : ca_s) {
+                if (!isInCAorDA(t)) {
+                    da.add(t);
+                }
+            }
+            for (Triplet t : da_s) {
+                if (!isInCAorDA(t)) {
+                    da.add(t);
+                }
+            }
 
             objectOutputStream.writeObject(ca);
             objectOutputStream.writeObject(da);
@@ -229,5 +245,19 @@ public class Equipement {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean isInCAorDA(Triplet triplet) {
+        for (Triplet t : ca) {
+            if (t.equals(triplet)) {
+                return true;
+            }
+        }
+        for (Triplet t : da) {
+            if (t.equals(triplet)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
