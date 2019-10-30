@@ -7,25 +7,25 @@ import java.net.UnknownHostException;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
+import java.util.HashSet;
 
 public class Equipement {
     private PaireClesRSA maCle; // La paire de cle de l’equipement.
     private Certificat monCert; // Le certificat auto-signe.
     private String monNom; // Identite de l’equipement.
     private int monPort; // Le numéro de port d’ecoute.
-    private ArrayList<Triplet> ca;
-    private ArrayList<Triplet> da;
+    private HashSet<Triplet> ca;
+    private HashSet<Triplet> da;
 
     private Socket socket = null;
 
-    Equipement (String nom, int port) {
+    Equipement(String nom, int port) {
         monNom = nom;
         monPort = port;
         maCle = new PaireClesRSA();
         monCert = new Certificat(monNom, maCle.Privee(), maCle.Publique(), 365);
-        ca = new ArrayList<Triplet>();
-        da = new ArrayList<Triplet>();
+        ca = new HashSet<Triplet>();
+        da = new HashSet<Triplet>();
 
     }
 
@@ -52,7 +52,7 @@ public class Equipement {
         affichage_da();
     }
 
-    public String monNom (){
+    public String monNom() {
         return monNom;
     }
 
@@ -74,8 +74,7 @@ public class Equipement {
 
     public void startServer() {
 // starts server and waits for a connection
-        try
-        {
+        try {
             ServerSocket serverSocket = new ServerSocket(monPort);
             System.out.println("Server started");
 
@@ -93,10 +92,9 @@ public class Equipement {
 
             System.out.println("Insérer l'équipement " + nom_c + " ? oui/non");
 
-            BufferedReader input  = new BufferedReader(new InputStreamReader(System.in));
+            BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
             String test = input.readLine();
-            if (test.equals("oui"))
-            {
+            if (test.equals("oui")) {
                 // Sending confirmation
                 objectOutputStream.writeObject(true);
 
@@ -112,13 +110,11 @@ public class Equipement {
                 Triplet triplet = new Triplet(nom_c, publicKey_c, cert_c);
                 ca.add(triplet);
 
-                ArrayList<Triplet> da_c = new ArrayList<Triplet>();
+                HashSet<Triplet> da_c = new HashSet<Triplet>();
                 da_c.addAll(ca);
                 da_c.addAll(da);
                 objectOutputStream.writeObject(da_c);
-            }
-            else
-            {
+            } else {
                 // Sending refusal
                 objectOutputStream.writeObject(false);
             }
@@ -127,14 +123,12 @@ public class Equipement {
             // close connection
             socket.close();
             serverSocket.close();
-        }
-        catch(IOException | ClassNotFoundException | CertificateException i)
-        {
+        } catch (IOException | ClassNotFoundException | CertificateException i) {
             System.out.println(i);
         }
     }
 
-    public void startClient(){
+    public void startClient() {
         try {
             // establish a connection
             socket = new Socket("localhost", monPort);
@@ -149,9 +143,8 @@ public class Equipement {
             InputStream inputStream = socket.getInputStream();
             ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
 
-            boolean test = (boolean)objectInputStream.readObject();
-            if (test)
-            {
+            boolean test = (boolean) objectInputStream.readObject();
+            if (test) {
                 objectOutputStream.writeObject(maClePub());
 
                 X509Certificate cert_s = (X509Certificate) objectInputStream.readObject();
@@ -166,21 +159,75 @@ public class Equipement {
                 Certificat cert_c = new Certificat(nom_s, maCle.Privee(), publicKey_s, 365);
                 objectOutputStream.writeObject(cert_c.getX509Certificate());
 
-                da = (ArrayList<Triplet>) objectInputStream.readObject();
-            }
-            else
-            {
+                da = (HashSet<Triplet>) objectInputStream.readObject();
+            } else {
                 System.out.println("Insertion refusée");
             }
 
             // close the connection
             socket.close();
             System.out.println("Closing connection");
-        }
-        catch(IOException | ClassNotFoundException | CertificateException i)
-        {
+        } catch (IOException | ClassNotFoundException | CertificateException i) {
             System.out.println(i);
         }
 
+    }
+
+    public void synchronizeServer() {
+        try {
+            ServerSocket serverSocket = new ServerSocket(monPort);
+            System.out.println("Server started");
+
+            System.out.println("Waiting for a client ...");
+
+            socket = serverSocket.accept();
+            System.out.println("Client accepted");
+
+            InputStream inputStream = socket.getInputStream();
+            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+            OutputStream outputStream = socket.getOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+
+
+            objectOutputStream.writeObject(ca);
+            objectOutputStream.writeObject(da);
+
+            HashSet<Triplet> ca_c = (HashSet<Triplet>) objectInputStream.readObject();
+            HashSet<Triplet> da_c = (HashSet<Triplet>) objectInputStream.readObject();
+            da.addAll(ca_c);
+            da.addAll(da_c);
+
+            socket.close();
+            serverSocket.close();
+
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void synchronizeClient() {
+        try {
+            socket = new Socket("localhost", monPort);
+            System.out.println("Connecté");
+
+            OutputStream outputStream = socket.getOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+            InputStream inputStream = socket.getInputStream();
+            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+
+            HashSet<Triplet> ca_s = (HashSet<Triplet>) objectInputStream.readObject();
+            HashSet<Triplet> da_s = (HashSet<Triplet>) objectInputStream.readObject();
+            da.addAll(ca_s);
+            da.addAll(da_s);
+
+            objectOutputStream.writeObject(ca);
+            objectOutputStream.writeObject(da);
+
+            socket.close();
+
+
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }

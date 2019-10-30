@@ -70,6 +70,14 @@ public class Main {
                     equipement.startClient();
                     break;
 
+                case "ss":
+                    equipement.synchronizeServer();
+                    break;
+
+                case "sc":
+                    equipement.synchronizeClient();
+                    break;
+
                 case "q":
                     break;
 
