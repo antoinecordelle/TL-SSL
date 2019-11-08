@@ -98,12 +98,13 @@ public class Equipement {
                 // Sending confirmation
                 objectOutputStream.writeObject(true);
 
-                PublicKey publicKey_c = (PublicKey) objectInputStream.readObject();
+                X509Certificate cert_auto_c = (X509Certificate) objectInputStream.readObject();
+                PublicKey publicKey_c = cert_auto_c.getPublicKey();
 
                 Certificat cert_s = new Certificat(nom_c, maCle.Privee(), publicKey_c, 365);
                 objectOutputStream.writeObject(cert_s.getX509Certificate());
                 objectOutputStream.writeObject(monNom());
-                objectOutputStream.writeObject(maClePub());
+                objectOutputStream.writeObject(monCert.getX509Certificate());
 
                 X509Certificate cert_c = (X509Certificate) objectInputStream.readObject();
                 // add certificate to CA
@@ -145,11 +146,12 @@ public class Equipement {
 
             boolean test = (boolean) objectInputStream.readObject();
             if (test) {
-                objectOutputStream.writeObject(maClePub());
+                objectOutputStream.writeObject(monCert.getX509Certificate());
 
                 X509Certificate cert_s = (X509Certificate) objectInputStream.readObject();
                 String nom_s = (String) objectInputStream.readObject();
-                PublicKey publicKey_s = (PublicKey) objectInputStream.readObject();
+                X509Certificate cert_auto_s = (X509Certificate) objectInputStream.readObject();
+                PublicKey publicKey_s = cert_auto_s.getPublicKey();
                 System.out.println("Insertion terminée");
 
                 // add certificate to CA
