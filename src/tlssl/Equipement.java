@@ -131,13 +131,7 @@ public class Equipement {
             serverSocket.close();
         } catch (IOException | ClassNotFoundException | CertificateException i) {
             System.out.println(i);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException | NoSuchProviderException e) {
             e.printStackTrace();
         }
     }
@@ -187,13 +181,7 @@ public class Equipement {
             System.out.println("Closing connection");
         } catch (IOException | ClassNotFoundException | CertificateException i) {
             System.out.println(i);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException | NoSuchProviderException e) {
             e.printStackTrace();
         }
 
@@ -236,17 +224,7 @@ public class Equipement {
             socket.close();
             serverSocket.close();
 
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
+        } catch (IOException | ClassNotFoundException | CertificateException | NoSuchAlgorithmException | InvalidKeyException | SignatureException | NoSuchProviderException e) {
             e.printStackTrace();
         }
     }
@@ -282,17 +260,7 @@ public class Equipement {
             socket.close();
 
 
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
+        } catch (IOException | ClassNotFoundException | CertificateException | NoSuchAlgorithmException | InvalidKeyException | SignatureException | NoSuchProviderException e) {
             e.printStackTrace();
         }
     }
