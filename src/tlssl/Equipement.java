@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
@@ -107,6 +107,10 @@ public class Equipement {
                 objectOutputStream.writeObject(monCert.getX509Certificate());
 
                 X509Certificate cert_c = (X509Certificate) objectInputStream.readObject();
+
+                // verify certificate
+                cert_c.verify(publicKey_c);
+
                 // add certificate to CA
                 Triplet triplet = new Triplet(nom_c, publicKey_c, cert_c);
                 ca.add(triplet);
@@ -115,6 +119,7 @@ public class Equipement {
                 da_c.addAll(ca);
                 da_c.addAll(da);
                 objectOutputStream.writeObject(da_c);
+                System.out.println("Insertion terminée");
             } else {
                 // Sending refusal
                 objectOutputStream.writeObject(false);
@@ -126,6 +131,14 @@ public class Equipement {
             serverSocket.close();
         } catch (IOException | ClassNotFoundException | CertificateException i) {
             System.out.println(i);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
         }
     }
 
@@ -154,6 +167,9 @@ public class Equipement {
                 PublicKey publicKey_s = cert_auto_s.getPublicKey();
                 System.out.println("Insertion terminée");
 
+                // verify certificate
+                cert_s.verify(publicKey_s);
+
                 // add certificate to CA
                 Triplet triplet = new Triplet(nom_s, publicKey_s, cert_s);
                 ca.add(triplet);
@@ -171,6 +187,14 @@ public class Equipement {
             System.out.println("Closing connection");
         } catch (IOException | ClassNotFoundException | CertificateException i) {
             System.out.println(i);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
         }
 
     }
@@ -197,11 +221,13 @@ public class Equipement {
             HashSet<Triplet> ca_c = (HashSet<Triplet>) objectInputStream.readObject();
             HashSet<Triplet> da_c = (HashSet<Triplet>) objectInputStream.readObject();
             for (Triplet t : ca_c) {
+                t.cert.verify(t.cert.getPublicKey());
                 if (!isInCAorDA(t)) {
                     da.add(t);
                 }
             }
             for (Triplet t : da_c) {
+                t.cert.verify(t.cert.getPublicKey());
                 if (!isInCAorDA(t)) {
                     da.add(t);
                 }
@@ -211,6 +237,16 @@ public class Equipement {
             serverSocket.close();
 
         } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
             e.printStackTrace();
         }
     }
@@ -228,11 +264,13 @@ public class Equipement {
             HashSet<Triplet> ca_s = (HashSet<Triplet>) objectInputStream.readObject();
             HashSet<Triplet> da_s = (HashSet<Triplet>) objectInputStream.readObject();
             for (Triplet t : ca_s) {
+                t.cert.verify(t.cert.getPublicKey());
                 if (!isInCAorDA(t)) {
                     da.add(t);
                 }
             }
             for (Triplet t : da_s) {
+                t.cert.verify(t.cert.getPublicKey());
                 if (!isInCAorDA(t)) {
                     da.add(t);
                 }
@@ -245,6 +283,16 @@ public class Equipement {
 
 
         } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
             e.printStackTrace();
         }
     }
