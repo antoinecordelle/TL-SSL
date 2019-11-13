@@ -26,7 +26,7 @@ public class Certificat {
     static private BigInteger seqnum = BigInteger.ZERO;
     public X509CertificateHolder x509CertificateHolder;
 
-    Certificat(String nom, PrivateKey privateKey, PublicKey publicKey, int validityDays) {
+    Certificat(String missuer, String msubject, PrivateKey privateKey, PublicKey publicKey, int validityDays) {
         // On cree la structure qui va contenir la signature :
         try {
             Security.addProvider(new BouncyCastleProvider());
@@ -38,8 +38,8 @@ public class Certificat {
             SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
 
             // Nom du proprio et certifieur : (ici les mêmes car auto signé)
-            X500Name issuer = new X500Name("CN=" + nom);
-            X500Name subject = new X500Name("CN=" + nom);
+            X500Name issuer = new X500Name("CN=" + missuer);
+            X500Name subject = new X500Name("CN=" + msubject);
 
             // Numero de serie du futur certificat
             seqnum = seqnum.add(BigInteger.ONE);

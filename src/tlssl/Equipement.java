@@ -23,7 +23,7 @@ public class Equipement {
         monNom = nom;
         monPort = port;
         maCle = new PaireClesRSA();
-        monCert = new Certificat(monNom, maCle.Privee(), maCle.Publique(), 365);
+        monCert = new Certificat(monNom, monNom, maCle.Privee(), maCle.Publique(), 365);
         ca = new HashSet<Triplet>();
         da = new HashSet<Triplet>();
 
@@ -67,7 +67,7 @@ public class Equipement {
     public void certify(Equipement equipement) throws CertificateException {
         String nom = equipement.monNom();
         PublicKey pubKey = equipement.maClePub();
-        Certificat cert = new Certificat(nom, maCle.Privee(), pubKey, 365);
+        Certificat cert = new Certificat(nom, nom, maCle.Privee(), pubKey, 365);
         Triplet triplet = new Triplet(nom, pubKey, cert.getX509Certificate());
         ca.add(triplet);
     }
@@ -104,7 +104,8 @@ public class Equipement {
                     X509Certificate cert_auto_c = (X509Certificate) objectInputStream.readObject();
                     PublicKey publicKey_c = cert_auto_c.getPublicKey();
 
-                    Certificat cert_s = new Certificat(nom_c, maCle.Privee(), publicKey_c, 365);
+                    Certificat cert_s = new Certificat(monNom, nom_c, maCle.Privee(), publicKey_c, 365);
+
                     objectOutputStream.writeObject(cert_s.getX509Certificate());
                     objectOutputStream.writeObject(monCert.getX509Certificate());
 
@@ -121,6 +122,16 @@ public class Equipement {
                     da_c.addAll(ca);
                     da_c.addAll(da);
                     objectOutputStream.writeObject(da_c);
+
+                    HashSet<Triplet> da_s = (HashSet<Triplet>) objectInputStream.readObject();
+                    for (Triplet t : da_s) {
+                        t.cert.verify(t.pubKey);
+                        if (!isInCAorDA(t)) {
+                            da.add(t);
+                        }
+                    }
+
+
                     System.out.println("Insertion terminée");
                 }
                 else {
@@ -183,10 +194,22 @@ public class Equipement {
                     Triplet triplet = new Triplet(nom_s, publicKey_s, cert_s);
                     ca.add(triplet);
 
-                    Certificat cert_c = new Certificat(nom_s, maCle.Privee(), publicKey_s, 365);
+                    Certificat cert_c = new Certificat(monNom, nom_s, maCle.Privee(), publicKey_s, 365);
                     objectOutputStream.writeObject(cert_c.getX509Certificate());
 
-                    da = (HashSet<Triplet>) objectInputStream.readObject();
+                    HashSet<Triplet> da_c = (HashSet<Triplet>) objectInputStream.readObject();
+                    for (Triplet t : da_c) {
+                        t.cert.verify(t.pubKey);
+                        if (!isInCAorDA(t)) {
+                            da.add(t);
+                        }
+                    }
+
+                    HashSet<Triplet> da_s = new HashSet<Triplet>();
+                    da_s.addAll(ca);
+                    da_s.addAll(da);
+                    objectOutputStream.writeObject(da_s);
+
                 }
                 else {
                     // Sending refusal
