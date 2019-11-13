@@ -97,29 +97,35 @@ public class Equipement {
             if (test.equals("oui")) {
                 // Sending confirmation
                 objectOutputStream.writeObject(true);
-
-                X509Certificate cert_auto_c = (X509Certificate) objectInputStream.readObject();
-                PublicKey publicKey_c = cert_auto_c.getPublicKey();
-
-                Certificat cert_s = new Certificat(nom_c, maCle.Privee(), publicKey_c, 365);
-                objectOutputStream.writeObject(cert_s.getX509Certificate());
                 objectOutputStream.writeObject(monNom());
-                objectOutputStream.writeObject(monCert.getX509Certificate());
 
-                X509Certificate cert_c = (X509Certificate) objectInputStream.readObject();
+                boolean test2 = (boolean) objectInputStream.readObject();
+                if (test2) {
+                    X509Certificate cert_auto_c = (X509Certificate) objectInputStream.readObject();
+                    PublicKey publicKey_c = cert_auto_c.getPublicKey();
 
-                // verify certificate
-                cert_c.verify(publicKey_c);
+                    Certificat cert_s = new Certificat(nom_c, maCle.Privee(), publicKey_c, 365);
+                    objectOutputStream.writeObject(cert_s.getX509Certificate());
+                    objectOutputStream.writeObject(monCert.getX509Certificate());
 
-                // add certificate to CA
-                Triplet triplet = new Triplet(nom_c, publicKey_c, cert_c);
-                ca.add(triplet);
+                    X509Certificate cert_c = (X509Certificate) objectInputStream.readObject();
 
-                HashSet<Triplet> da_c = new HashSet<Triplet>();
-                da_c.addAll(ca);
-                da_c.addAll(da);
-                objectOutputStream.writeObject(da_c);
-                System.out.println("Insertion terminée");
+                    // verify certificate
+                    cert_c.verify(publicKey_c);
+
+                    // add certificate to CA
+                    Triplet triplet = new Triplet(nom_c, publicKey_c, cert_c);
+                    ca.add(triplet);
+
+                    HashSet<Triplet> da_c = new HashSet<Triplet>();
+                    da_c.addAll(ca);
+                    da_c.addAll(da);
+                    objectOutputStream.writeObject(da_c);
+                    System.out.println("Insertion terminée");
+                }
+                else {
+                    System.out.println("Insertion refusée");
+                }
             } else {
                 // Sending refusal
                 objectOutputStream.writeObject(false);
@@ -153,25 +159,39 @@ public class Equipement {
 
             boolean test = (boolean) objectInputStream.readObject();
             if (test) {
-                objectOutputStream.writeObject(monCert.getX509Certificate());
 
-                X509Certificate cert_s = (X509Certificate) objectInputStream.readObject();
                 String nom_s = (String) objectInputStream.readObject();
-                X509Certificate cert_auto_s = (X509Certificate) objectInputStream.readObject();
-                PublicKey publicKey_s = cert_auto_s.getPublicKey();
-                System.out.println("Insertion terminée");
+                System.out.println("S'insérer sur le réseau de l'équipement " + nom_s + " ? oui/non");
 
-                // verify certificate
-                cert_s.verify(publicKey_s);
+                BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+                String test2 = input.readLine();
 
-                // add certificate to CA
-                Triplet triplet = new Triplet(nom_s, publicKey_s, cert_s);
-                ca.add(triplet);
+                if (test2.equals("oui")) {
+                    objectOutputStream.writeObject(true);
 
-                Certificat cert_c = new Certificat(nom_s, maCle.Privee(), publicKey_s, 365);
-                objectOutputStream.writeObject(cert_c.getX509Certificate());
+                    objectOutputStream.writeObject(monCert.getX509Certificate());
 
-                da = (HashSet<Triplet>) objectInputStream.readObject();
+                    X509Certificate cert_s = (X509Certificate) objectInputStream.readObject();
+                    X509Certificate cert_auto_s = (X509Certificate) objectInputStream.readObject();
+                    PublicKey publicKey_s = cert_auto_s.getPublicKey();
+                    System.out.println("Insertion terminée");
+
+                    // verify certificate
+                    cert_s.verify(publicKey_s);
+
+                    // add certificate to CA
+                    Triplet triplet = new Triplet(nom_s, publicKey_s, cert_s);
+                    ca.add(triplet);
+
+                    Certificat cert_c = new Certificat(nom_s, maCle.Privee(), publicKey_s, 365);
+                    objectOutputStream.writeObject(cert_c.getX509Certificate());
+
+                    da = (HashSet<Triplet>) objectInputStream.readObject();
+                }
+                else {
+                    // Sending refusal
+                    objectOutputStream.writeObject(false);
+                }
             } else {
                 System.out.println("Insertion refusée");
             }
